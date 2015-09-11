@@ -7,6 +7,7 @@
 
 var Thing = require('../api/thing/thing.model');
 var User = require('../api/user/user.model');
+var Vote = require('../api/vote/vote.model');
 
 Thing.find({}).remove(function() {
   Thing.create({
@@ -46,4 +47,23 @@ User.find({}).remove(function() {
       console.log('finished populating users');
     }
   );
+});
+
+Vote.find({}).remove(function() {
+  Vote.create({
+    name: 'Is FreeCodeCamp good?',
+    options: [
+      {name: 'Good'},
+      {name: 'So so'},
+      {name: 'Poor'}
+    ]
+  }, {
+    name: 'Do you like Black or White?',
+    options: [
+      {name: 'Black'},
+      {name: 'White'},
+      {name: 'Both'},
+      {name: 'None'}
+    ]
+  })
 });

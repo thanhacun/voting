@@ -1,0 +1,29 @@
+div(ng-include='"components/navbar/navbar.html"')
+header#banner.hero-unit
+  .container
+    h1 Speak you options
+    p Sign in to begin
+//Show list of polls
+.container
+  .row
+    .col-lg-12
+      h1.page-header List of polls
+    ul.col-md-4.col-sm-6.list-group(ng-repeat='poll in polls')
+      | {{poll.name}}
+      button.btn.btn-danger.pull-right(type='button', ng-click='deletePoll(poll)') Delete
+      li.list-group-item(ng-repeat='option in poll.options') {{option.name}}
+
+  //Form to input new poll
+  form.vote-form(ng-submit='addPoll()')
+    label Please input new poll
+    p.input-group
+      input.form-control(type='text', placeholder='Name of poll', ng-model='newPoll.name')
+      p Poll options
+      input.form-control(type='text', placeholder='Option 1', ng-model='newPoll.options[0].name')
+      input.form-control(type='text', placeholder='Option 2', ng-model='newPoll.options[1].name')
+      button.btn.btn-primary(type='submit') Add new
+
+footer.footer
+  .container
+    p
+      | By THCN
