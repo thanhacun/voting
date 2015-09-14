@@ -17,10 +17,10 @@ header#banner.hero-unit
   form.vote-form(ng-submit='addPoll()')
     label Please input new poll
     p.input-group
-      input.form-control(type='text', placeholder='Name of poll', ng-model='newPoll.name')
-      p Poll options
-      input.form-control(type='text', placeholder='Option 1', ng-model='newPoll.options[0].name')
-      input.form-control(type='text', placeholder='Option 2', ng-model='newPoll.options[1].name')
+      input.form-control(type='text', placeholder='Which drink do you prefer?', ng-model='newPoll.name')
+      .form-group
+        label Poll options
+        input.form-control(type='text', ng-repeat='option in ["Coca", "Pepsi"] track by $index', ng-model="newPoll.options[$index]", placeholder="{{option}}")
       button.btn.btn-primary(type='submit') Add new
 
 footer.footer

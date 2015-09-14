@@ -10,19 +10,17 @@ angular.module('votingApp')
     });
 
     $scope.addPoll = function(){
-      if ($scope.newPoll.name === '' || $scope.newPoll.options.length === 0) {
+      //check having poll name or any Option
+      if ($scope.newPoll.name === '' || typeof($scope.newPoll.options) === 'undefined') {
         return;
       }
-      //create options
+      //convert input options as a object into array to match with data schema
       var raw_options = $scope.newPoll.options;
       var options = [];
-      for (var i = 0; i ++; i < raw_options.length) {
-        options.push({
-          name: raw_options[i]
-        })
-      }
-      console.log($scope.newPoll);
-      console.log(raw_options);
+      $.each(raw_options, function(key, option) {
+        options.push({name: option});
+      });
+
       $http.post('/api/votes', {
         name: $scope.newPoll.name,
         options: options
