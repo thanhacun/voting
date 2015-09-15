@@ -2,13 +2,18 @@
 
 var _ = require('lodash');
 var Vote = require('./vote.model');
+var User = require('../user/user.model');
 
 // Get list of votes
 exports.index = function(req, res) {
-  Vote.find(function (err, votes) {
-    if(err) { return handleError(res, err); }
-    return res.status(200).json(votes);
+  //get user _id
+  User.find({email:req.params.email}, function(err, user) {
+    Vote.find({user: user._id}, function (err, votes) {
+      if(err) { return handleError(res, err); }
+      return res.status(200).json(votes);
+    });
   });
+
 };
 
 // Get a single vote

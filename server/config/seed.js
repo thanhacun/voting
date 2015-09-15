@@ -45,7 +45,7 @@ User.find({}).remove(function() {
     password: 'admin'
   }, function() {
       console.log('finished populating users');
-      User.findOne({name: 'Test User'}, function(err, test_user) {
+      User.findOne({email: 'test@test.com'}, function(err, test_user) {
         Vote.find({}).remove(function() {
           Vote.create({
             name: 'Is FreeCodeCamp good?',
@@ -70,7 +70,7 @@ User.find({}).remove(function() {
               if (err) console.error(err);
               console.log(vote.user);
               console.log(vote.user.name, vote.user.email);
-            })
+            });
           })
         });
       });

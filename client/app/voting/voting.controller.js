@@ -1,10 +1,11 @@
 'use strict';
 
 angular.module('votingApp')
-  .controller('VotingCtrl', function ($scope, $http, socket) {
+  .controller('VotingCtrl', function ($scope, $http, $routeParams, socket, Auth, User) {
     $scope.polls = [];
+    var email = $routeParams.email;
 
-    $http.get('/api/votes').success(function(polls){
+    $http.get('/api/votes/' + email).success(function(polls){
       $scope.polls = polls;
       socket.syncUpdates('vote', $scope.polls);
     });
@@ -24,9 +25,15 @@ angular.module('votingApp')
       $http.post('/api/votes', {
         name: $scope.newPoll.name,
         options: options
-
+        //TODO add user _id here
+      }).success(function(newPoll){
+        //update $scope.polls to get _id
+        console.log(newPoll);
+        $scope.polls.pop();
+        $scope.polls.push(newPoll);
+        $scope.newPoll = '';
+        console.log($scope.polls)
       });
-      $scope.newPoll = '';
     };
 
     $scope.deletePoll = function(poll){
