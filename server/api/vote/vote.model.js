@@ -9,7 +9,8 @@ var OptionSchema = new Schema({
 
 var VoteSchema = new Schema({
   name: String,
-  options: [OptionSchema]
+  options: [OptionSchema],
+  user: {type: Schema.Types.ObjectId, ref: 'User'}
 });
 
 module.exports = mongoose.model('Vote', VoteSchema);

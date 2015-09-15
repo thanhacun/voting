@@ -45,25 +45,39 @@ User.find({}).remove(function() {
     password: 'admin'
   }, function() {
       console.log('finished populating users');
+      User.findOne({name: 'Test User'}, function(err, test_user) {
+        Vote.find({}).remove(function() {
+          Vote.create({
+            name: 'Is FreeCodeCamp good?',
+            options: [
+              {name: 'Good'},
+              {name: 'So so'},
+              {name: 'Poor'}
+            ],
+            user: test_user._id
+          }, {
+            name: 'Do you like Black or White?',
+            options: [
+              {name: 'Black'},
+              {name: 'White'},
+              {name: 'Both'},
+              {name: 'None'}
+            ],
+            user: test_user._id
+          }, function() {
+            //just test populate
+            Vote.findOne({}).populate('user', 'name email').exec(function(err, vote) {
+              if (err) console.error(err);
+              console.log(vote.user);
+              console.log(vote.user.name, vote.user.email);
+            })
+          })
+        });
+      });
     }
   );
 });
 
-Vote.find({}).remove(function() {
-  Vote.create({
-    name: 'Is FreeCodeCamp good?',
-    options: [
-      {name: 'Good'},
-      {name: 'So so'},
-      {name: 'Poor'}
-    ]
-  }, {
-    name: 'Do you like Black or White?',
-    options: [
-      {name: 'Black'},
-      {name: 'White'},
-      {name: 'Both'},
-      {name: 'None'}
-    ]
-  })
-});
+
+
+
