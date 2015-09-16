@@ -3,12 +3,18 @@
 angular.module('votingApp')
   .controller('VotingCtrl', function ($scope, $http, $routeParams, socket, Auth, User) {
     $scope.polls = [];
-    var email = $routeParams.email;
+    $scope.currentUser = Auth.getCurrentUser();
+    var login_name = $scope.currentUser.name;
+    var login_id = $scope.currentUser._id
+    var inputed_name = $routeParams.name;
 
-    $http.get('/api/votes/' + email).success(function(polls){
-      $scope.polls = polls;
-      socket.syncUpdates('vote', $scope.polls);
-    });
+    $http.get('/api/votes/' + inputed_name).success(function(polls){
+      //login user can see only his/her votes
+      if (inputed_name === login_name) {
+        $scope.polls = polls;
+        socket.syncUpdates('vote', $scope.polls);
+      }
+    })  ;
 
     $scope.addPoll = function(){
       //check having poll name or any Option
@@ -18,14 +24,14 @@ angular.module('votingApp')
       //convert input options as a object into array to match with data schema
       var raw_options = $scope.newPoll.options;
       var options = [];
-      $.each(raw_options, function(key, option) {
+      angular.forEach(raw_options, function(option, key) {
         options.push({name: option});
       });
 
       $http.post('/api/votes', {
         name: $scope.newPoll.name,
-        options: options
-        //TODO add user _id here
+        options: options,
+        user: login_id
       }).success(function(newPoll){
         //update $scope.polls to get _id
         console.log(newPoll);
@@ -42,5 +48,12 @@ angular.module('votingApp')
 
     $scope.$on('$destroy', function() {
       socket.unsyncUpdates('vote');
-    })
+    });
+
+    $scope.doPoll = function(poll){
+      console.log('Update poll options select');
+      console.log($scope);
+      console.log(poll);
+      //update user select to poll options
+    }
   });

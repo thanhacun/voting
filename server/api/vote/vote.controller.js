@@ -6,10 +6,11 @@ var User = require('../user/user.model');
 
 // Get list of votes
 exports.index = function(req, res) {
-  //get user _id
-  User.find({email:req.params.email}, function(err, user) {
+  //filter votes by user id
+  User.findOne({name:req.params.name}, function(err, user) {
     Vote.find({user: user._id}, function (err, votes) {
       if(err) { return handleError(res, err); }
+      //console.log(user._id);
       return res.status(200).json(votes);
     });
   });

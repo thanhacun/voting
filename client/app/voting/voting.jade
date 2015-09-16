@@ -11,7 +11,11 @@ header#banner.hero-unit
     ul.col-md-4.col-sm-6.list-group(ng-repeat='poll in polls')
       | {{poll.name}}
       button.btn.btn-danger.pull-right(type='button', ng-click='deletePoll(poll)') Delete
-      li.list-group-item(ng-repeat='option in poll.options') {{option.name}}
+      button.btn.btn-primary.pull-right(type='button', ng-click='doPoll(poll)') Vote
+      li.list-group-item(ng-repeat='option in poll.options track by $index')
+        label
+          input(type='radio', name='{{poll.name + "_options"}}', ng-model='voted', value='1')
+          | {{" " + option.name}}
 
   //Form to input new poll
   form.vote-form(ng-submit='addPoll()')
