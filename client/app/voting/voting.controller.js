@@ -6,11 +6,18 @@ angular.module('votingApp')
     $scope.currentUser = Auth.getCurrentUser();
     var login_name = $scope.currentUser.name;
     var login_id = $scope.currentUser._id
-    var inputed_name = $routeParams.name;
+    var input_name = $routeParams.name;
 
-    $http.get('/api/votes/' + inputed_name).success(function(polls){
+    $scope.options = ['Coca', 'Pepsi'];
+
+    $scope.addOption = function() {
+      $scope.options.push('Option');
+      console.log('Add options');
+    }
+
+    $http.get('/api/votes/' + input_name).success(function(polls){
       //login user can see only his/her votes
-      if (inputed_name === login_name) {
+      if (input_name === login_name) {
         $scope.polls = polls;
         socket.syncUpdates('vote', $scope.polls);
       }
@@ -27,18 +34,18 @@ angular.module('votingApp')
       angular.forEach(raw_options, function(option, key) {
         options.push({name: option});
       });
-
-      $http.post('/api/votes', {
+      var newPoll = {
         name: $scope.newPoll.name,
         options: options,
         user: login_id
-      }).success(function(newPoll){
+      }
+      $scope.polls.push(newPoll);
+
+      $http.post('/api/votes', newPoll).success(function(newPoll){
         //update $scope.polls to get _id
-        console.log(newPoll);
         $scope.polls.pop();
         $scope.polls.push(newPoll);
         $scope.newPoll = '';
-        console.log($scope.polls)
       });
     };
 
@@ -52,7 +59,8 @@ angular.module('votingApp')
 
     $scope.doPoll = function(poll){
       console.log('Update poll options select');
-      console.log($scope);
+      console.log($scope.voted);
+      console.log($scope.newPoll.name);
       console.log(poll);
       //update user select to poll options
     }
