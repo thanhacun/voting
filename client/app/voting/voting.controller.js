@@ -9,6 +9,7 @@ angular.module('votingApp')
     var input_name = $routeParams.name;
 
     $scope.options = ['Coca', 'Pepsi'];
+    $scope.votes = {};
 
     $scope.addOption = function() {
       $scope.options.push('Option');
@@ -58,10 +59,10 @@ angular.module('votingApp')
     });
 
     $scope.doPoll = function(poll){
-      console.log('Update poll options select');
-      console.log($scope.voted);
-      console.log($scope.newPoll.name);
-      console.log(poll);
+      console.log('User select', $scope.votes.check, 'for', poll._id);
+      console.log(JSON.stringify(poll));
       //update user select to poll options
+      var update = {'options[0].select': 4};
+      $http.put('/api/votes/' + poll._id, update);
     }
   });
