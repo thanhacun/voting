@@ -15,12 +15,14 @@ header#banner.hero-unit
           label
             input(type='radio', name='{{poll.name + "_options"}}', value='{{option._id}}', ng-model='vote.select')
             |{{" " + option.name}}
+        //TODO: confirm on delete
         button.btn.btn-danger(type='button', ng-click='deletePoll(poll)') Delete
         button.btn.btn-primary(type='button', ng-click='doPoll(poll)') Vote
-      canvas.col-sm-6(id='{{poll._id}}', width='200', height='200')
+      canvas.col-sm-6(id='{{poll._id}}')
+      //TODO: show chart online
       //script.
-        var testChart = document.getElementById('{{poll._id}}').getContext('2d');
-        new Chart(testChart).Bar('{{data[poll._id]}}');
+        var testChart = document.getElementById(poll._id).getContext('2d');
+        new Chart(testChart).Bar(data[poll._id]);
 
   //Form to input new poll
   //only show when login

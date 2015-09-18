@@ -2,6 +2,7 @@
 
 angular.module('votingApp')
   .controller('VotingCtrl', function ($scope, $http, $routeParams, socket, Auth, User) {
+    //TODO: function to generate poll data
     $scope.polls = [];
     $scope.data = {};
     $scope.currentUser = Auth.getCurrentUser();
@@ -18,6 +19,24 @@ angular.module('votingApp')
       console.log('Add options');
     }
 
+    $scope.getPollData = function(poll) {
+      //$scope.data[poll._id] = {};
+      var result = {};
+      //create label for data set from options name
+      result.labels = poll.options.map(function(option){
+        return option.name;
+      });
+      //create data set
+      result.datasets =[{
+        fillColor: "#48A497",
+        strokeColor: "#48A4D1",
+        data: poll.options.map(function(option){
+          return option.select;
+        })
+      }];
+      return result;
+    }
+
     $http.get('/api/votes/' + input_name).success(function(polls){
       //login user can see only his/her votes
       if (input_name === login_name) {
@@ -25,22 +44,9 @@ angular.module('votingApp')
         socket.syncUpdates('vote', $scope.polls);
         //generate data to use with Chart.js
         angular.forEach(polls, function(poll, key){
-          $scope.data[poll._id] = {};
-          //create label for data set from options name
-          $scope.data[poll._id].labels = poll.options.map(function(option){
-            return option.name;
-          });
-          //create data set
-          $scope.data[poll._id].datasets =[{
-            fillColor: "#48A497",
-            strokeColor: "#48A4D1",
-            data: poll.options.map(function(option){
-              return option.select;
-            })
-          }];
+          $scope.data[poll._id] = $scope.getPollData(poll);
         });
         console.log(JSON.stringify($scope.data));
-
       }
     });
 
@@ -66,6 +72,7 @@ angular.module('votingApp')
         //update $scope.polls to get _id
         $scope.polls.pop();
         $scope.polls.push(newPoll);
+        $scope.data[newPoll._id] = $scope.getPollData(newPoll);
         $scope.newPoll = '';
       });
     };
@@ -86,17 +93,21 @@ angular.module('votingApp')
           option.select ++;
         }
       });
-      console.log('User select', option_id, 'for', poll.name);
+      //console.log('User select', option_id, 'for', poll.name);
       //TODO it is hard to update subdocument partly, temporary update the whole object
-      $http.put('/api/votes/' + poll._id, poll).success(function(poll){
-        $scope.showChart(poll);
+      $scope.showChart(poll);
+      /*
+      $http.put('/api/votes/' + poll._id, poll).then(function(response){
+        console.log(JSON.stringify(response.data));
+        $scope.showChart(response.data);
       });
-      console.log(JSON.stringify(poll));
+      */
+      //console.log(JSON.stringify(poll));
     }
 
     $scope.showChart = function(poll) {
-      console.log(poll._id);
-      console.log($scope.data[poll._id]);
+      //console.log(poll._id);
+      //console.log($scope.data[poll._id]);
       var testChart = document.getElementById(poll._id).getContext('2d');
       new Chart(testChart).Bar($scope.data[poll._id]);
     }
