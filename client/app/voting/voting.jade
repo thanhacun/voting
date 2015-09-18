@@ -13,7 +13,7 @@ header#banner.hero-unit
         label {{poll.name}}
         .form-group(ng-repeat='option in poll.options track by $index')
           label
-            input(type='radio', name='{{poll.name + "_options"}}', value='{{option._id}}', ng-model="votes.check")
+            input(type='radio', name='{{poll.name + "_options"}}', value='{{option._id}}', ng-model='vote.select')
             |{{" " + option.name}}
         button.btn.btn-danger(type='button', ng-click='deletePoll(poll)') Delete
         button.btn.btn-primary(type='button', ng-click='doPoll(poll)' ) Vote

@@ -9,7 +9,7 @@ angular.module('votingApp')
     var input_name = $routeParams.name;
 
     $scope.options = ['Coca', 'Pepsi'];
-    $scope.votes = {};
+    $scope.vote = {};
 
     $scope.addOption = function() {
       $scope.options.push('Option');
@@ -59,10 +59,16 @@ angular.module('votingApp')
     });
 
     $scope.doPoll = function(poll){
-      console.log('User select', $scope.votes.check, 'for', poll._id);
+      var option_id = $scope.vote.select;
+      //increase 1 to the selected option
+      poll.options.map(function(option) {
+        if (option._id === option_id) {
+          option.select ++;
+        }
+      });
+      console.log('User select', option_id, 'for', poll.name);
+      //TODO it is hard to update subdocument partly, temporary update the whole object
+      $http.put('/api/votes/' + poll._id, poll);
       console.log(JSON.stringify(poll));
-      //update user select to poll options
-      var update = {'options[0].select': 4};
-      $http.put('/api/votes/' + poll._id, update);
     }
   });
