@@ -95,13 +95,13 @@ angular.module('votingApp')
       });
       //console.log('User select', option_id, 'for', poll.name);
       //TODO it is hard to update subdocument partly, temporary update the whole object
-      $scope.showChart(poll);
-      /*
+      //$scope.showChart(poll);
+
       $http.put('/api/votes/' + poll._id, poll).then(function(response){
         console.log(JSON.stringify(response.data));
         $scope.showChart(response.data);
       });
-      */
+
       //console.log(JSON.stringify(poll));
     }
 
