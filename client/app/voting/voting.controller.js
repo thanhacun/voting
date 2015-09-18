@@ -3,7 +3,9 @@
 angular.module('votingApp')
   .controller('VotingCtrl', function ($scope, $http, $routeParams, socket, Auth, User) {
     $scope.polls = [];
+    $scope.data = {};
     $scope.currentUser = Auth.getCurrentUser();
+    $scope.isLoggedInAsync = Auth.isLoggedInAsync
     var login_name = $scope.currentUser.name;
     var login_id = $scope.currentUser._id
     var input_name = $routeParams.name;
@@ -21,8 +23,26 @@ angular.module('votingApp')
       if (input_name === login_name) {
         $scope.polls = polls;
         socket.syncUpdates('vote', $scope.polls);
+        //generate data to use with Chart.js
+        angular.forEach(polls, function(poll, key){
+          $scope.data[poll._id] = {};
+          //create label for data set from options name
+          $scope.data[poll._id].labels = poll.options.map(function(option){
+            return option.name;
+          });
+          //create data set
+          $scope.data[poll._id].datasets =[{
+            fillColor: "#48A497",
+            strokeColor: "#48A4D1",
+            data: poll.options.map(function(option){
+              return option.select;
+            })
+          }];
+        });
+        console.log(JSON.stringify($scope.data));
+
       }
-    })  ;
+    });
 
     $scope.addPoll = function(){
       //check having poll name or any Option
@@ -68,7 +88,16 @@ angular.module('votingApp')
       });
       console.log('User select', option_id, 'for', poll.name);
       //TODO it is hard to update subdocument partly, temporary update the whole object
-      $http.put('/api/votes/' + poll._id, poll);
+      $http.put('/api/votes/' + poll._id, poll).success(function(poll){
+        $scope.showChart(poll);
+      });
       console.log(JSON.stringify(poll));
+    }
+
+    $scope.showChart = function(poll) {
+      console.log(poll._id);
+      console.log($scope.data[poll._id]);
+      var testChart = document.getElementById(poll._id).getContext('2d');
+      new Chart(testChart).Bar($scope.data[poll._id]);
     }
   });

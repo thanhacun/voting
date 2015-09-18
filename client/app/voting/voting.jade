@@ -8,18 +8,23 @@ header#banner.hero-unit
   .row
     .col-lg-12
       h1.page-header List of polls
-    .col-sm-4.col-xs-6(ng-repeat='poll in polls')
-      form.list-group
+    .col-sm-6(ng-repeat='poll in polls')
+      form.col-sm-6.list-group
         label {{poll.name}}
         .form-group(ng-repeat='option in poll.options track by $index')
           label
             input(type='radio', name='{{poll.name + "_options"}}', value='{{option._id}}', ng-model='vote.select')
             |{{" " + option.name}}
         button.btn.btn-danger(type='button', ng-click='deletePoll(poll)') Delete
-        button.btn.btn-primary(type='button', ng-click='doPoll(poll)' ) Vote
+        button.btn.btn-primary(type='button', ng-click='doPoll(poll)') Vote
+      canvas.col-sm-6(id='{{poll._id}}', width='200', height='200')
+      //script.
+        var testChart = document.getElementById('{{poll._id}}').getContext('2d');
+        new Chart(testChart).Bar('{{data[poll._id]}}');
 
   //Form to input new poll
-  .row
+  //only show when login
+  .row(ng-show='isLoggedInAsync')
     .col-lg-12
       h1.page-header Add new polls
     form.col-sm-6.vote-form(ng-submit='addPoll()')
