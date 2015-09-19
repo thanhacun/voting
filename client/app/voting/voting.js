@@ -6,6 +6,6 @@ angular.module('votingApp')
       .when('/voting/:name', {
         templateUrl: 'app/voting/voting.html',
         controller: 'VotingCtrl',
-        authenticate: true
+        //authenticate: true
       });
   });

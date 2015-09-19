@@ -65,10 +65,10 @@ User.find({}).remove(function() {
             ],
             user: test_user._id
           }, function() {
-            //just test populate
+            //just test populate result
             Vote.findOne({}).populate('user', 'name email').exec(function(err, vote) {
               if (err) console.error(err);
-              console.log(vote.user);
+              //console.log(vote.user);
               console.log(vote.user.name, vote.user.email);
             });
           })
