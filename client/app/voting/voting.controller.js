@@ -13,6 +13,7 @@ angular.module('votingApp')
 
     $scope.options = ['Coca', 'Pepsi'];
     $scope.vote = {};
+    $scope.showChart = false;
 
     $scope.addOption = function() {
       $scope.options.push('Option');
@@ -99,7 +100,8 @@ angular.module('votingApp')
 
       $http.put('/api/votes/' + poll._id, poll).then(function(response){
         console.log(JSON.stringify(response.data));
-        $scope.showChart(response.data);
+        //$scope.showChart(response.data);
+        $scope.showChart = true;
       });
 
       //console.log(JSON.stringify(poll));
@@ -111,4 +113,8 @@ angular.module('votingApp')
       var testChart = document.getElementById(poll._id).getContext('2d');
       new Chart(testChart).Bar($scope.data[poll._id]);
     }
+  })
+  .controller('ChartCtrl', function($scope) {
+    console.log('Showing Chart')
+    //var testChart = document.getElementById()
   });

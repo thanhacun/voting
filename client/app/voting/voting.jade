@@ -18,7 +18,7 @@ header#banner.hero-unit
         //TODO: confirm on delete
         button.btn.btn-danger(type='button', ng-click='deletePoll(poll)') Delete
         button.btn.btn-primary(type='button', ng-click='doPoll(poll)') Vote
-      canvas.col-sm-6(id='{{poll._id}}')
+      canvas.col-sm-6(ng-controller='ChartCtrl', id='{{poll._id}}', ng-show='showChart')
       //TODO: show chart online
       //script.
         var testChart = document.getElementById(poll._id).getContext('2d');
