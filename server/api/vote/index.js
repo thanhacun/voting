@@ -5,7 +5,8 @@ var controller = require('./vote.controller');
 
 var router = express.Router();
 
-router.get('/:name', controller.index);
+router.get('/', controller.index);
+router.get('/:name', controller.filter);
 router.get('/:id', controller.show);
 router.post('/', controller.create);
 router.put('/:id', controller.update);

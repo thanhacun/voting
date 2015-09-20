@@ -2,10 +2,10 @@ div(ng-include='"components/navbar/navbar.html"')
 header#banner.hero-unit
   .container
     h1 Speak you options
-    p Sign in to begin
+    a.btn.btn-primary.btn-danger.btn-lg(href='/login') Sign in to make your owned vote
 .container
-  //Show list of polls
-  .row
+  //Show list of polls - hide when in editing mode
+  .row(ng-hide='samplePoll._id')
     .col-lg-12
       h1.page-header.text-center List of polls
     .col-md-6.col-sm-12(ng-repeat='poll in polls')
@@ -17,28 +17,29 @@ header#banner.hero-unit
             |{{" " + option.name}}
         //TODO: confirm on delete; disable if not author
         button.btn.btn-danger(type='button', ng-click='deletePoll(poll)', ng-disabled='!isLoggedIn') Delete
-        //TODO: add option
-        button.btn.btn-primary(type='button', ng-click='addOption(poll)', ng-disabled='!isLoggedIn') Add Option
+        button.btn.btn-primary(type='button', ng-click='editPoll(poll)', ng-disabled='!isLoggedIn') Edit
         //enable only when click on a option
         button.btn.btn-success(type='button', ng-disabled='voteBtn[poll._id].canNotSubmit', ng-click='updatePollData(poll)') Vote
       .show-chart.col-sm-6
         canvas.chart.chart-bar(id='{{poll._id}}', chart-data='data[poll._id].data', chart-labels='data[poll._id].labels')
-      //TODO: show chart online
 
   //Form to input new poll
   //only show when login
   .row(ng-show='isLoggedIn')
     .col-lg-12
-      h1.page-header.text-center Add new polls
+      h1.page-header.text-center Add or Update polls
+      p.lead.text-info Empty an option if you want to delete it
     form.col-sm-6.vote-form(ng-submit='addPoll()')
       .form-group
         label Please input new poll
-        input.form-control(type='text', placeholder='Which drink do you prefer?', ng-model='newPoll.name')
+        input.form-control(type='text', placeholder='{{samplePoll.name}}', ng-model='newPoll.name')
       .form-group
         label Poll options
-        input.form-control(type='text', ng-repeat='option in options track by $index', ng-model="newPoll.options[$index]", placeholder="{{option}}")
+        input.form-control(type='text', ng-repeat='option in samplePoll.options track by $index', ng-model="newPoll.options[$index].name", placeholder="{{option.name}}")
+      button.btn.btn-danger(type='submit', ng-disabled='samplePoll._id') Add new
       button.btn.btn-primary(type='button', ng-click='moreOption()') More options
-      button.btn.btn-danger(type='submit') Add new
+      button.btn.btn-success(type='button', ng-click='updatePoll(samplePoll)') Update
+      button.btn.btn-info(type='button', ng-click='resetForm()') Reset
 
 footer.footer
   .container

@@ -2,9 +2,18 @@
 
 angular.module('votingApp')
   .controller('VotingCtrl', function ($scope, $http, $routeParams, socket, Auth, User) {
-    //TODO: function to generate poll data
     $scope.polls = [];
-    $scope.newPoll = {};
+    $scope.initSamplePoll = function() {
+      $scope.samplePoll = {
+        name: 'Which drink do you prefer?',
+        options: [
+          {name: 'Coca'},
+          {name: 'Pepsi'}
+        ]
+      };
+      $scope.newPoll = {};
+    };
+    $scope.initSamplePoll();
     $scope.data = {};
     $scope.currentUser = Auth.getCurrentUser();
     Auth.isLoggedInAsync(function(bool){
@@ -15,24 +24,41 @@ angular.module('votingApp')
     var login_name = $scope.currentUser.name;
     var login_id = $scope.currentUser._id
     var input_name = $routeParams.name;
+    var getUrl = '/api/votes';
+    if (input_name) {
+      getUrl = getUrl + '/' + input_name;
+    }
 
     $scope.voteBtn = {};
-    $scope.options = ['Coca', 'Pepsi'];
     $scope.vote = {};
-    $scope.showChart = false;
     //helper functions
     $scope.moreOption = function() {
-      $scope.options.push('Option');
-      console.log('Add options');
+      $scope.samplePoll.options.push({name: 'Options'});
+      //console.log('Add options');
     }
 
     $scope.optionSelect = function(poll) {
       $scope.voteBtn[poll._id].canNotSubmit = false;
-
     }
 
-    $scope.addOption = function(poll) {
-      console.log('Add option');
+    $scope.editPoll = function(poll) {
+      console.log('Edit poll');
+      $scope.samplePoll = poll;
+      $scope.newPoll = $scope.samplePoll;
+    }
+
+    $scope.updatePoll = function(updatedPoll) {
+      //remove empty options
+      updatedPoll.options = updatedPoll.options.filter(function(option){
+        return option.name !== '';
+      });
+      $http.put('/api/votes/' + updatedPoll._id, updatedPoll).success(function(poll){
+        $scope.initSamplePoll();
+      });
+    }
+
+    $scope.resetForm = function(){
+      $scope.initSamplePoll();
     }
 
     $scope.getPollData = function(poll) {
@@ -66,11 +92,10 @@ angular.module('votingApp')
       $http.put('/api/votes/' + poll._id, poll).then(function (response) {
         console.log(JSON.stringify(response.data));
         //$scope.showChart(response.data);
-        $scope.showChart = true;
       });
     }
 
-    $http.get('/api/votes/' + input_name).success(function(polls){
+    $http.get(getUrl).success(function(polls){
       $scope.polls = polls;
       socket.syncUpdates('vote', $scope.polls);
       //creating useful data for polls
@@ -80,7 +105,6 @@ angular.module('votingApp')
         //generate disable value for vote button
         $scope.voteBtn[poll._id] = {canNotSubmit: true};
       });
-        //console.log(JSON.stringify($scope.data));
     });
 
     $scope.addPoll = function(){
@@ -88,12 +112,13 @@ angular.module('votingApp')
       if ($scope.newPoll.name === '' || typeof($scope.newPoll.options) === 'undefined') {
         return;
       }
-      console.log($scope.polls);
+      console.log(JSON.stringify($scope.newPoll));
       //convert input options as a object into array to match with data schema
+
       var raw_options = $scope.newPoll.options;
       var options = [];
       angular.forEach(raw_options, function(option, key) {
-        options.push({name: option});
+        options.push(option);
       });
       var newPoll = {
         name: $scope.newPoll.name,
@@ -110,7 +135,6 @@ angular.module('votingApp')
         $scope.data[poll._id] = $scope.getPollData(poll);
         $scope.voteBtn[poll._id] = {canNotSubmit: true};
         console.log(poll._id);
-        $scope.newPoll = '';
       });
     };
 
@@ -121,13 +145,5 @@ angular.module('votingApp')
     $scope.$on('$destroy', function() {
       socket.unsyncUpdates('vote');
     });
-      //console.log(JSON.stringify(poll));
-
-    $scope.showChart = function(poll) {
-      //console.log(poll._id);
-      //console.log($scope.data[poll._id]);
-      var testChart = document.getElementById(poll._id).getContext('2d');
-      new Chart(testChart).Bar($scope.data[poll._id]);
-    }
 
   })

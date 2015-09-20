@@ -6,7 +6,13 @@ var User = require('../user/user.model');
 
 // Get list of votes
 exports.index = function(req, res) {
-  //filter votes by user id
+  Vote.find({}, function (err, votes) {
+    if(err) {return handleError(res, err); }
+    return res.status(200).json(votes);
+  })
+};
+//Filter list of votes by user name
+exports.filter = function(req, res) {
   User.findOne({name:req.params.name}, function(err, user) {
     Vote.find({user: user._id}, function (err, votes) {
       if(err) { return handleError(res, err); }
