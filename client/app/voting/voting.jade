@@ -2,24 +2,30 @@ div(ng-include='"components/navbar/navbar.html"')
 header#banner.hero-unit
   .container
     h1 Speak you options
-    a.btn.btn-primary.btn-danger.btn-lg(href='/login') Sign in to make your owned vote
+    p.lead Simple web app support creating quick polls
+    a.btn.btn-primary.btn-danger.btn-lg(href='/login', ng-hide='currentUser._id') Sign in to make your owned vote
 .container
   //Show list of polls - hide when in editing mode
   .row(ng-hide='samplePoll._id')
     .col-lg-12
       h1.page-header.text-center List of polls
-    .col-md-6.col-sm-12(ng-repeat='poll in polls')
+    .col-md-6.col-sm-12(ng-repeat='poll in polls', ng-hide='inputPollTitle === poll.name')
+      p.lead.text-info.col-sm-12.text-center.page-header {{poll.name}}
       form.col-sm-6.list-group
-        label {{poll.name}}
+        //label {{poll.name}}
         .form-group(ng-repeat='option in poll.options track by $index')
           label
             input(type='radio', name='{{poll.name + "_options"}}', value='{{option._id}}', ng-model='vote.select', ng-click='optionSelect(poll)')
             |{{" " + option.name}}
         //TODO: confirm on delete; disable if not author
-        button.btn.btn-danger(type='button', ng-click='deletePoll(poll)', ng-disabled='!isLoggedIn') Delete
-        button.btn.btn-primary(type='button', ng-click='editPoll(poll)', ng-disabled='!isLoggedIn') Edit
+        button.btn.btn-danger(type='button', ng-click='deletePoll(poll)', ng-disabled='currentUser._id!==poll.user')
+          span.glyphicon.glyphicon-trash
+        button.btn.btn-primary(type='button', ng-click='editPoll(poll)', ng-disabled='currentUser._id!==poll.user')
+          span.glyphicon.glyphicon-edit
         //enable only when click on a option
-        button.btn.btn-success(type='button', ng-disabled='voteBtn[poll._id].canNotSubmit', ng-click='updatePollData(poll)') Vote
+        //TODO: uncheck after vote
+        button.btn.btn-success(type='button', ng-disabled='voteBtn[poll._id].canNotSubmit', ng-click='updatePollData(poll)')
+          span.glyphicon.glyphicon-thumbs-up
       .show-chart.col-sm-6
         canvas.chart.chart-bar(id='{{poll._id}}', chart-data='data[poll._id].data', chart-labels='data[poll._id].labels')
 
@@ -36,10 +42,14 @@ header#banner.hero-unit
       .form-group
         label Poll options
         input.form-control(type='text', ng-repeat='option in samplePoll.options track by $index', ng-model="newPoll.options[$index].name", placeholder="{{option.name}}")
-      button.btn.btn-danger(type='submit', ng-disabled='samplePoll._id') Add new
-      button.btn.btn-primary(type='button', ng-click='moreOption()') More options
-      button.btn.btn-success(type='button', ng-click='updatePoll(samplePoll)') Update
-      button.btn.btn-info(type='button', ng-click='resetForm()') Reset
+      button.btn.btn-danger(type='submit', ng-disabled='samplePoll._id')
+        span.glyphicon.glyphicon-plus
+      button.btn.btn-primary(type='button', ng-click='moreOption()')
+        span.glyphicon.glyphicon-pencil
+      button.btn.btn-success(type='button', ng-click='updatePoll(samplePoll)')
+        span.glyphicon.glyphicon-floppy-disk
+      button.btn.btn-info(type='button', ng-click='resetForm()')
+        span.glyphicon.glyphicon-refresh
 
 footer.footer
   .container

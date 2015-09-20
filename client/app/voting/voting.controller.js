@@ -16,17 +16,11 @@ angular.module('votingApp')
     $scope.initSamplePoll();
     $scope.data = {};
     $scope.currentUser = Auth.getCurrentUser();
-    Auth.isLoggedInAsync(function(bool){
-      if (bool) {
-        $scope.isLoggedIn = true;
-      }
-    });
-    var login_name = $scope.currentUser.name;
-    var login_id = $scope.currentUser._id
-    var input_name = $routeParams.name;
+    $scope.inputPollTitle = $routeParams.title;
+    $scope.inputName = $routeParams.name;
     var getUrl = '/api/votes';
-    if (input_name) {
-      getUrl = getUrl + '/' + input_name;
+    if ($scope.inputName) {
+      getUrl = getUrl + '/' + $scope.inputName;
     }
 
     $scope.voteBtn = {};
@@ -123,18 +117,16 @@ angular.module('votingApp')
       var newPoll = {
         name: $scope.newPoll.name,
         options: options,
-        user: login_id
+        user: $scope.currentUser._id
       }
-      //$scope.polls.push(newPoll);
-      //console.log(newPoll._id);
 
       $http.post('/api/votes', newPoll).success(function(poll){
-        //update $scope.polls to get _id
-        //$scope.polls.pop();
+        //update $scope.polls to make sure polls having _id
         $scope.polls.push(poll);
         $scope.data[poll._id] = $scope.getPollData(poll);
         $scope.voteBtn[poll._id] = {canNotSubmit: true};
-        console.log(poll._id);
+        $scope.initSamplePoll();
+        console.log('Added new poll:', JSON.stringify(poll));
       });
     };
 

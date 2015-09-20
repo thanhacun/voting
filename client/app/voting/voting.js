@@ -7,5 +7,13 @@ angular.module('votingApp')
         templateUrl: 'app/voting/voting.html',
         controller: 'VotingCtrl',
         //authenticate: true
+      })
+      .when('/:name', {
+        templateUrl: 'app/voting/voting.html',
+        controller: 'VotingCtrl'
+      })
+      .when('/:name/:title', {
+        templateUrl: 'app/voting/voting.html',
+        controller: 'VotingCtrl'
       });
   });
