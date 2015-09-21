@@ -6,10 +6,16 @@ var User = require('../user/user.model');
 
 // Get list of votes
 exports.index = function(req, res) {
+  Vote.find({}).populate('user', 'name').exec(function(err, votes){
+    if(err) {return handleError(res, err);}
+    return res.status(200).json(votes);
+  });
+  /*
   Vote.find({}, function (err, votes) {
     if(err) {return handleError(res, err); }
     return res.status(200).json(votes);
   })
+  */
 };
 //Filter list of votes by user name
 exports.filter = function(req, res) {

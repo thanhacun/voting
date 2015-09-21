@@ -1,9 +1,10 @@
 'use strict';
 
 angular.module('votingApp')
-  .controller('VotingCtrl', function ($scope, $http, $routeParams, socket, Auth, User) {
+  .controller('VotingCtrl', function ($scope, $http, $routeParams, $location, socket, Auth, User) {
     $scope.polls = [];
     $scope.initSamplePoll = function() {
+      console.log('Init sample data');
       $scope.samplePoll = {
         name: 'Which drink do you prefer?',
         options: [
@@ -16,19 +17,19 @@ angular.module('votingApp')
     $scope.initSamplePoll();
     $scope.data = {};
     $scope.currentUser = Auth.getCurrentUser();
-    $scope.inputPollTitle = $routeParams.title;
+    $scope.inputPollId = $routeParams.poll_id;
     $scope.inputName = $routeParams.name;
     var getUrl = '/api/votes';
     if ($scope.inputName) {
       getUrl = getUrl + '/' + $scope.inputName;
     }
-
+    $scope.absUrl = $location.absUrl();
     $scope.voteBtn = {};
     $scope.vote = {};
     //helper functions
     $scope.moreOption = function() {
+      console.log('Add more options');
       $scope.samplePoll.options.push({name: 'Options'});
-      //console.log('Add options');
     }
 
     $scope.optionSelect = function(poll) {
@@ -48,16 +49,19 @@ angular.module('votingApp')
       });
       $http.put('/api/votes/' + updatedPoll._id, updatedPoll).success(function(poll){
         $scope.initSamplePoll();
+        $scope.getPollData(poll);
+        console.log('Update poll', JSON.stringify(poll));
       });
     }
 
     $scope.resetForm = function(){
+      console.log('Reset');
       $scope.initSamplePoll();
     }
 
     $scope.getPollData = function(poll) {
       var result = {};
-      //create label for data set from options name
+      //create labels for data set from options name
       result.labels = poll.options.map(function(option){
         return option.name;
       });
@@ -67,6 +71,7 @@ angular.module('votingApp')
           return option.select;
         })
       ];
+      console.log('Get poll data', JSON.stringify(result));
       return result;
     }
 
@@ -84,14 +89,14 @@ angular.module('votingApp')
       $scope.data[poll._id] = $scope.getPollData(poll);
       //TODO it is hard to update subdocument partly, temporary update the whole object
       $http.put('/api/votes/' + poll._id, poll).then(function (response) {
-        console.log(JSON.stringify(response.data));
-        //$scope.showChart(response.data);
+        console.log('Update poll data', JSON.stringify(response.data));
       });
     }
 
     $http.get(getUrl).success(function(polls){
       $scope.polls = polls;
       socket.syncUpdates('vote', $scope.polls);
+      console.log(JSON.stringify(polls));
       //creating useful data for polls
       angular.forEach(polls, function(poll, key){
         //generate data to use with chart
@@ -106,9 +111,7 @@ angular.module('votingApp')
       if ($scope.newPoll.name === '' || typeof($scope.newPoll.options) === 'undefined') {
         return;
       }
-      console.log(JSON.stringify($scope.newPoll));
       //convert input options as a object into array to match with data schema
-
       var raw_options = $scope.newPoll.options;
       var options = [];
       angular.forEach(raw_options, function(option, key) {
@@ -117,25 +120,49 @@ angular.module('votingApp')
       var newPoll = {
         name: $scope.newPoll.name,
         options: options,
-        user: $scope.currentUser._id
+        user: $scope.currentUser
       }
-
+      $scope.polls.push(newPoll);
       $http.post('/api/votes', newPoll).success(function(poll){
         //update $scope.polls to make sure polls having _id
+        poll.user = {
+          _id: poll.user,
+          name: $scope.currentUser.name
+        };
+        $scope.polls.pop();
         $scope.polls.push(poll);
         $scope.data[poll._id] = $scope.getPollData(poll);
         $scope.voteBtn[poll._id] = {canNotSubmit: true};
         $scope.initSamplePoll();
-        console.log('Added new poll:', JSON.stringify(poll));
+        console.log('Add new poll:', JSON.stringify(poll));
       });
     };
 
     $scope.deletePoll = function(poll){
-      $http.delete('/api/votes/'+ poll._id);
+      if(confirm('Are you sure')) {
+        console.log('Delete poll', JSON.stringify(poll));
+        $http.delete('/api/votes/'+ poll._id)
+      }
     };
 
     $scope.$on('$destroy', function() {
       socket.unsyncUpdates('vote');
     });
 
+  })
+  //directives
+  //Making bootstrap tooltip work with angularjs
+  //inspired from http://stackoverflow.com/questions/20666900/using-bootstrap-tooltip-with-angularjs
+  //TODO: a directive for cofirm dialog on delete
+  .directive('tooltip', function() {
+    return {
+      restrict: 'A',
+      link: function(scope, element, attrs) {
+        $(element).hover(function() {
+          $(element).tooltip('show');
+        }, function() {
+          $(element).tooltip('hide');
+        });
+      }
+    };
   })

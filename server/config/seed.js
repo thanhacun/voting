@@ -48,7 +48,7 @@ User.find({}).remove(function() {
       User.findOne({email: 'test@test.com'}, function(err, test_user) {
         Vote.find({}).remove(function() {
           Vote.create({
-            name: 'Is FreeCodeCamp good?',
+            name: 'How good is FreeCodeCamp',
             options: [
               {name: 'Good'},
               {name: 'So so'},
@@ -56,12 +56,12 @@ User.find({}).remove(function() {
             ],
             user: test_user._id
           }, {
-            name: 'Do you like Black or White?',
+            name: 'Which color do you like',
             options: [
               {name: 'Black'},
               {name: 'White'},
-              {name: 'Both'},
-              {name: 'None'}
+              {name: 'Yellow'},
+              {name: 'Blue'}
             ],
             user: test_user._id
           }, function() {

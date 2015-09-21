@@ -12,7 +12,7 @@ angular.module('votingApp')
         templateUrl: 'app/voting/voting.html',
         controller: 'VotingCtrl'
       })
-      .when('/:name/:title', {
+      .when('/:user_id/:poll_id', {
         templateUrl: 'app/voting/voting.html',
         controller: 'VotingCtrl'
       });
