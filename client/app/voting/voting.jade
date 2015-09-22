@@ -7,8 +7,7 @@ header#banner.hero-unit
 .container
   //Show list of polls - hide when in editing mode
   .row(ng-hide='samplePoll._id')
-    .col-lg-12
-      h1.text-center List of polls
+    h1.col-lg-12.text-center List of polls
     //hide all other poll when routing to a specific poll
     .col-sm-12(ng-repeat='poll in polls', ng-hide='inputPollId ? inputPollId !== poll._id: false')
       h3.text-info.col-sm-12.text-center {{poll.name}}
@@ -53,6 +52,8 @@ header#banner.hero-unit
         span.glyphicon.glyphicon-floppy-disk
       button.btn.btn-info(type='button', ng-click='resetForm()', data-toggle='tooltip', title='Reset/Cancel')
         span.glyphicon.glyphicon-refresh
+      //.form-group.hide-elements
+        input.form-control(type='text', ng-hide='false', value='{{poll.user.name}}', ng-model='poll.user.name')
 
 footer.footer
   .container
