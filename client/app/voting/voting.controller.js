@@ -96,8 +96,17 @@ angular.module('votingApp')
 
     $http.get(getUrl).success(function(polls){
       $scope.polls = polls;
-      socket.syncUpdates('vote', $scope.polls);
-      console.log(JSON.stringify(polls));
+      //Automatic update $scope.polls when update event
+      socket.syncUpdates('vote', $scope.polls, function(e, i, a) {
+        if (e === 'created') {
+          //console.log(i);
+          i.user = $scope.currentUser;
+        }
+        if (e === 'updated') {
+          console.log(i);
+        }
+      });
+      //console.log(JSON.stringify(polls));
       //creating useful data for polls
       angular.forEach(polls, function(poll){
         //generate data to use with chart
@@ -108,6 +117,7 @@ angular.module('votingApp')
     });
 
     $scope.addPoll = function(){
+      console.log(JSON.stringify($scope.polls));
       //check having poll name or any Option
       if ($scope.newPoll.name === '' || typeof($scope.newPoll.options) === 'undefined') {
         return;
@@ -123,20 +133,15 @@ angular.module('votingApp')
         options: options,
         user: $scope.currentUser
       };
-      $scope.polls.push(newPoll);
       $http.post('/api/votes', newPoll).success(function(poll){
         //update $scope.polls to make sure polls having _id
-        poll.user = {
-          _id: poll.user,
-          name: $scope.currentUser.name
-        };
-        $scope.polls.pop();
-        $scope.polls.push(poll);
+        poll.user = $scope.currentUser;
         $scope.data[poll._id] = $scope.getPollData(poll);
         $scope.voteBtn[poll._id] = {canNotSubmit: true};
         $scope.initSamplePoll();
         console.log('Add new poll:', JSON.stringify(poll));
       });
+
     };
 
     $scope.deletePoll = function(poll){

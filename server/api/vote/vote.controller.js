@@ -40,12 +40,16 @@ exports.show = function(req, res) {
 
 // Creates a new vote in the DB.
 exports.create = function(req, res) {
+  //NOTE: socket event will happen when vote is just created
   Vote.create(req.body, function(err, vote) {
     if(err) { return handleError(res, err); }
+    return res.status(201).json(vote);
+    /*
     Vote.findById(vote._id).populate('user', 'name').exec(function(err, populatedVote){
       if(err) { return handleError(res, err)}
       return res.status(201).json(populatedVote);
     })
+    */
   });
 };
 
