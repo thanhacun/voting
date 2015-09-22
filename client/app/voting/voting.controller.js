@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('votingApp')
-  .controller('VotingCtrl', function ($scope, $http, $routeParams, $location, socket, Auth, User) {
+  .controller('VotingCtrl', function ($scope, $http, $routeParams, $location, socket, Auth) {
     $scope.polls = [];
     $scope.initSamplePoll = function() {
       console.log('Init sample data');
@@ -30,19 +30,20 @@ angular.module('votingApp')
     $scope.moreOption = function() {
       console.log('Add more options');
       $scope.samplePoll.options.push({name: 'Options'});
-    }
+    };
 
     $scope.optionSelect = function(poll) {
       $scope.voteBtn[poll._id].canNotSubmit = false;
-    }
+    };
 
     $scope.editPoll = function(poll) {
       console.log('Edit poll');
       $scope.samplePoll = poll;
       $scope.newPoll = $scope.samplePoll;
-    }
+    };
 
     $scope.updatePoll = function(updatedPoll) {
+      console.log(JSON.stringify(updatedPoll));
       //remove empty options
       updatedPoll.options = updatedPoll.options.filter(function(option){
         return option.name !== '';
@@ -52,12 +53,12 @@ angular.module('votingApp')
         $scope.getPollData(poll);
         console.log('Update poll', JSON.stringify(poll));
       });
-    }
+    };
 
     $scope.resetForm = function(){
       console.log('Reset');
       $scope.initSamplePoll();
-    }
+    };
 
     $scope.getPollData = function(poll) {
       var result = {};
@@ -73,7 +74,7 @@ angular.module('votingApp')
       ];
       console.log('Get poll data', JSON.stringify(result));
       return result;
-    }
+    };
 
     $scope.updatePollData = function(poll) {
       //disable vote button
@@ -88,17 +89,17 @@ angular.module('votingApp')
       //update poll result
       $scope.data[poll._id] = $scope.getPollData(poll);
       //TODO it is hard to update subdocument partly, temporary update the whole object
-      $http.put('/api/votes/' + poll._id, poll).then(function (response) {
-        console.log('Update poll data', JSON.stringify(response.data));
+      $http.put('/api/votes/' + poll._id, poll).success(function (updatedPoll) {
+        console.log('Update poll data', JSON.stringify(updatedPoll));
       });
-    }
+    };
 
     $http.get(getUrl).success(function(polls){
       $scope.polls = polls;
       socket.syncUpdates('vote', $scope.polls);
       console.log(JSON.stringify(polls));
       //creating useful data for polls
-      angular.forEach(polls, function(poll, key){
+      angular.forEach(polls, function(poll){
         //generate data to use with chart
         $scope.data[poll._id] = $scope.getPollData(poll);
         //generate disable value for vote button
@@ -114,14 +115,14 @@ angular.module('votingApp')
       //convert input options as a object into array to match with data schema
       var raw_options = $scope.newPoll.options;
       var options = [];
-      angular.forEach(raw_options, function(option, key) {
+      angular.forEach(raw_options, function(option) {
         options.push(option);
       });
       var newPoll = {
         name: $scope.newPoll.name,
         options: options,
         user: $scope.currentUser
-      }
+      };
       $scope.polls.push(newPoll);
       $http.post('/api/votes', newPoll).success(function(poll){
         //update $scope.polls to make sure polls having _id
@@ -157,7 +158,7 @@ angular.module('votingApp')
   .directive('tooltip', function() {
     return {
       restrict: 'A',
-      link: function(scope, element, attrs) {
+      link: function(scope, element) {
         $(element).hover(function() {
           $(element).tooltip('show');
         }, function() {
@@ -165,4 +166,4 @@ angular.module('votingApp')
         });
       }
     };
-  })
+  });

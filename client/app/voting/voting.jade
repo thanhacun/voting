@@ -32,6 +32,7 @@ header#banner.hero-unit
         a.btn.btn-twitter(href='{{"https://twitter.com/intent/tweet?text=" + "You should try this poll:" + absUrl + poll.user + "/" + poll._id}}', data-toggle='tooltip', title='Share poll')
           span.fa.fa-twitter
       .show-chart.col-sm-6
+        //TODO: refresh label correctly if change option name
         canvas.chart.chart-bar(id='{{poll._id}}', chart-data='data[poll._id].data', chart-labels='data[poll._id].labels')
 
   //Form to input new poll
@@ -58,8 +59,6 @@ header#banner.hero-unit
       = ' '
       button.btn.btn-info(type='button', ng-click='resetForm()', data-toggle='tooltip', title='Reset/Cancel')
         span.glyphicon.glyphicon-refresh
-      //.form-group.hide-elements
-        input.form-control(type='text', ng-hide='false', value='{{poll.user.name}}', ng-model='poll.user.name')
 
 footer.footer
   .container
