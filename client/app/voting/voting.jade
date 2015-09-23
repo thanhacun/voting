@@ -29,7 +29,7 @@ header#banner.hero-unit
         button.btn.btn-success(type='button', ng-disabled='voteBtn[poll._id].canNotSubmit', ng-click='updatePollData(poll)', data-toggle='tooltip', title='Make a vote')
           span.glyphicon.glyphicon-thumbs-up
         = ' '
-        a.btn.btn-twitter(href='{{"https://twitter.com/intent/tweet?text=" + "You should try this poll:" + absUrl + poll.user + "/" + poll._id}}', data-toggle='tooltip', title='Share poll')
+        a.btn.btn-twitter(href='{{"https://twitter.com/intent/tweet?text=" + "You should try this poll: " + absUrl + poll.user._id + "/" + poll._id}}', data-toggle='tooltip', title='Share poll')
           span.fa.fa-twitter
       .show-chart.col-sm-6
         //TODO: refresh label correctly if change option name
